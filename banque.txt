@@ -1,0 +1,37 @@
+Simulateur bancaire.
+
+crée son compte perso 
+
+struct avec
+    nom
+    prenom
+    date de naissance
+    solde
+
+avoir un compte admin
+
+struct avec
+    nom
+    prenom
+    fonction    
+
+
+crée des comptes fictif
+
+
+COTE CLIENT
+
+    Fonction 
+            Virement
+            consulter son solde
+            (consulter son histoiruqe bancaire)
+
+
+COTE admin
+
+    Fonction
+            Chercher les comptes
+                Regarder les comptes
+                Prelever de l'argent
+                Ajouter de l'argent 
+
