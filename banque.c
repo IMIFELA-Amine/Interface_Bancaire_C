@@ -41,7 +41,7 @@ typedef enum {
 //     DIRECTEUR
 // }GRADE;
 
-char *listeGrade[] = {"Assistant", "Enmploye", "Cadre", "Cadre superieure", "Directeur"};
+char *listeGrade[] = {"Assistant", "Employe", "Cadre", "Cadre superieure", "Directeur"};
 
 Client* creationDeCompteFictif(){
 
@@ -99,17 +99,38 @@ int verifier_admin(char fonction[]){
 int trouver_beneficaire(char nom[], char prenom[], Client liste[]){
     int resultat = 1;
     int resultat2 = 1;
-    int i = 0;
 
-    for(i; i<30; i++){
+    for(int i = 0; i<30; i++){
         resultat = strcmp(nom, liste[i].nom);
 
         if(resultat == 0 ){
             resultat2 = strcmp(prenom, liste[i].prenom);
-            return i;
+            if (resultat2 == 0){
+                return i;
+            }
         }
     }
-    return 0;
+    return -1;
+
+}
+
+void FCThistorique(Client benef, Client liste[], int j){
+    
+    if(j != 0){
+        for(int i = 0; i < j; i++){
+            printf("#####################################################\n");
+            printf("#####################################################\n");
+            printf("            Virement n° %d\n", i+1);
+            printf("     De %s %s\n", benef.nom,benef.prenom);
+            printf("            Montant : %d €\n", liste[i+1].solde);
+            printf("     A %s %s\n", liste[i+1].nom, liste[i+1].prenom);
+            printf("#####################################################\n");
+            printf("#####################################################\n");
+        }
+    }
+    else {
+        printf("Aucun virement n'a etait passer\n");
+    }
 
 }
 
@@ -120,6 +141,7 @@ int main(void){
 
     Etat etatCourant = PAGE_PRINCIPALE;
     int choix = 0;
+    int nombreDeVirement = 0;
 
     // Creation compte fictif
     Client *bibliothequeClient =  creationDeCompteFictif();
@@ -127,12 +149,21 @@ int main(void){
     // Creation compte ADMIN
     Admin admin1;
 
+    // Creation de l'historique
+    Client *historique = malloc(sizeof(Client) * 20);
+    if (historique == NULL){
+        printf("Erreur d'allocation");
+        return 1;
+        }
+
     //Boucle générale
     while(etatCourant != QUITTER)
     {
         switch(etatCourant)
         {
             case PAGE_PRINCIPALE: // 0
+                printf("###############################################\n");
+                printf("###############################################\n");
                 printf("======= BIENVENUE A LA BANQUEE =========\n");
                 printf("Faite votre choix : \n");
                 printf("1 : ACCES COMPTE CLIENT\n");
@@ -146,20 +177,17 @@ int main(void){
                     etatCourant = PAGE_INFO_BANQUIER;
                 }
                 else {
-                    printf("!!!!!! NOUS N'AVONS PAS COMPRIS VOTRE CHOIX !!!!!!\n");
-                    printf("Faite votre choix : \n");
-                    printf("1 : ACCES COMPTE CLIENT\n");
-                    printf("2 : ACCES COMPTE ADMIN\n");
-                    scanf("%d", &choix);
+                    printf("Choix inconnu\n");
+                    break;
                 }
                 break;
 
 
             case PAGE_INFO_CLIENT:
                 printf("=====LA BANQUE=====\n");
-                printf("Entrez votre nom\n");
+                printf("Entrez votre Nom\n");
                 scanf("%s", bibliothequeClient[0].nom);
-                printf("Entrez votre prenom\n");
+                printf("Entrez votre Prénom\n");
                 scanf("%s", bibliothequeClient[0].prenom);
                 printf("Entrez votre date de naissance (01/01/1970) \n");
                 scanf("%s", bibliothequeClient[0].dateDeNaissance);
@@ -180,15 +208,19 @@ int main(void){
 
                 if(choix == 1){
                     etatCourant = PAGE_VIREMENT_CLIENT;
+                    break;
                 }
                 else if(choix == 2){
                     etatCourant = PAGE_SOLDE_CLIENT;
+                    break;
                 }
                 else if (choix == 3){
                     etatCourant = PAGE_HISTORIQUE_CLIENT;
+                    break;
                 }
                 else if(choix == 4){
                     etatCourant = PAGE_PRINCIPALE;
+                    break;
                 }
                 else {
                     printf("!!!!!! NOUS N'AVONS PAS COMPRIS VOTRE CHOIX !!!!!!\n");
@@ -205,6 +237,7 @@ int main(void){
                 printf("============ VIREMENT ============\n");
                 printf("Solde : %d\n", bibliothequeClient[0].solde);
                 printf("Indiquez le nom du bénéficiaire \n");
+                // printf("9 : Retour\n");
                 char nom_beneficiaire[30];
                 scanf("%s", nom_beneficiaire);
                 printf("Indiquez le prenom du bénéficiaire \n");
@@ -215,18 +248,84 @@ int main(void){
                 int trouverBeneficaire = trouver_beneficaire(nom_beneficiaire, prenom_beneficiaire, bibliothequeClient);
                 
                 if(trouverBeneficaire != 0){
+
                     printf("Vous voulez envoyé de l'argent a : \n %s %s, solde %d ?\n (oui/non)", bibliothequeClient[trouverBeneficaire].nom, bibliothequeClient[trouverBeneficaire].prenom,bibliothequeClient[trouverBeneficaire].solde);
                     char verification[4];
+                    char verification2[4];
                     scanf("%s", verification);
                     if(strcmp("oui", verification) == 0){
+                        
+                        printf("Veuillez saisir le montant : \n");
+                        int montant;
+                        scanf("%d", &montant);
+                        printf("Valider (oui/non)\n");
+                        scanf("%s", verification2);
+                        if(strcmp("oui", verification2)==0){
+                            bibliothequeClient[0].solde -= montant;
+                            bibliothequeClient[trouverBeneficaire].solde +=  montant;
+                            printf("---\n");
+                            printf("Votre solde actuelle : %d\n", bibliothequeClient[0].solde);
+                            printf("Vous avez transferer %d€\n", montant);
+                            printf("solde de %s %s %d€\n", bibliothequeClient[trouverBeneficaire].nom, bibliothequeClient[trouverBeneficaire].prenom, bibliothequeClient[trouverBeneficaire].solde);
+                            printf("---\n");
 
+                            nombreDeVirement = nombreDeVirement + 1;
+                            strcpy(historique[nombreDeVirement].nom,bibliothequeClient[trouverBeneficaire].nom);
+                            strcpy(historique[nombreDeVirement].prenom,bibliothequeClient[trouverBeneficaire].prenom);
+                            historique[nombreDeVirement].solde = montant;
+
+                            etatCourant = PAGE_CLIENT;
+                            sleep(5);
+                            
+                            break;
+                        }
+                        else if (strcmp("non",verification2)){
+                            printf("Opération annulé \n");
+                            etatCourant = PAGE_CLIENT;
+                            break;
+
+                        }
+                        else{
+                            printf("Nous n'avons pas compris votre demande ... \n");
+                            break;
+                        }
                     }
+                    else if (strcmp("non", verification) == 0) {
+                        printf("Redirection en cours ...\n");
+                        sleep(3);
+                        etatCourant = PAGE_CLIENT;
+                        break;
+                        }
+
+                    else{
+                        printf("Nous n'avons pas compris votre demande ... \n");
+                        break;
+                    }
+                
                 }
                 else{
                     printf("Nous n'avons malheuresment pas trouver %s %s dans notre base de données \n", nom_beneficiaire, prenom_beneficiaire);
                     etatCourant = PAGE_CLIENT;
                     break;
                 }
+                break;
+
+            case PAGE_SOLDE_CLIENT:
+
+                printf("##########################################################\n");
+                printf("__________________________________________________________\n");
+                printf("                 Mr/Mme %s %s\n", bibliothequeClient[0].nom, bibliothequeClient[0].prenom);
+                printf("                 SOLDE : %d \n", bibliothequeClient[0].solde);
+                printf("__________________________________________________________\n");
+                printf("##########################################################\n");
+                sleep(10);
+                etatCourant = PAGE_CLIENT;
+                break;
+
+            case PAGE_HISTORIQUE_CLIENT:
+                
+                FCThistorique(bibliothequeClient[0], historique, nombreDeVirement);
+                etatCourant = PAGE_CLIENT;
                 break;
 
             case PAGE_INFO_BANQUIER:
@@ -257,6 +356,7 @@ int main(void){
         }
     }
     free(bibliothequeClient);
+    free(historique);
 
     return 0;
 }
