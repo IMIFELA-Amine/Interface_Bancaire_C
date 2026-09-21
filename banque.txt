@@ -26,6 +26,23 @@ COTE CLIENT
             consulter son solde
             (consulter son histoiruqe bancaire)
 
+            pour avoir l'histoiruqe il faut une bibliotheque et dans cette bibliotheque je voudrias un truc du genre
+                n°1 Virement 
+                    De NOM PRENOM
+                        Montant
+                    à NOM PRENOM
+                n°2 Virement
+                    IMIFELA Amine
+                        500€
+                    Escobar Pablo
+            (Pouruqoi pas une fonction qui print ?)
+            fonction(Client clientbenef, Client liste[])
+                for (){
+                    printf()
+                }
+
+                donc il faut crée une liste dans la page virement qui prend les infos .
+
 
 COTE admin
 
@@ -34,4 +51,10 @@ COTE admin
                 Regarder les comptes
                 Prelever de l'argent
                 Ajouter de l'argent 
+
+
+
+
+Virement : mettre verification nombre negatif interdit 
+
 
